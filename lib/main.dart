@@ -24,6 +24,52 @@ void _registerPlatformViews() {
     },
   );
 
+  ui_web.platformViewRegistry.registerViewFactory('wikipedia-iframe', (
+    int viewId,
+  ) {
+    return html.IFrameElement()
+      ..src = 'https://en.wikipedia.org/wiki/Main_Page'
+      ..style.border = 'none'
+      ..style.width = '100%'
+      ..style.height = '100%';
+  });
+
+  ui_web.platformViewRegistry.registerViewFactory('wikipedia-in-div', (
+    int viewId,
+  ) {
+    // The iframe is taller than the div so the div has real scroll content.
+    // Chain: Wikipedia (cross-origin) → div (overflow:auto) → Flutter page.
+    final label = html.DivElement()
+      ..text =
+          '⬇ overflow:auto div — scroll here first, then the Flutter page takes over'
+      ..style.background = '#e65100'
+      ..style.color = 'white'
+      ..style.padding = '6px 12px'
+      ..style.fontSize = '12px'
+      ..style.fontFamily = 'monospace'
+      ..style.position = 'sticky'
+      ..style.top = '0'
+      ..style.zIndex = '10';
+
+    final iframe = html.IFrameElement()
+      ..src = 'https://en.wikipedia.org/wiki/Main_Page'
+      ..style.border = 'none'
+      ..style.width = '100%'
+      ..style.height = '800px'
+      ..style.display = 'block';
+
+    final container = html.DivElement()
+      ..style.width = '100%'
+      ..style.height = '100%'
+      ..style.overflow = 'auto'
+      ..style.border = '2px solid #e65100'
+      ..style.boxSizing = 'border-box'
+      ..append(label)
+      ..append(iframe);
+
+    return container;
+  });
+
   ui_web.platformViewRegistry.registerViewFactory(
     'scrollable-html-div',
     (int viewId) {
@@ -197,9 +243,40 @@ class _ComprehensiveTestPageState extends State<ComprehensiveTestPage> {
               ),
             ),
 
-            // TEST 2: Cross-origin iframe (YouTube)
+            // TEST 2: Cross-origin iframe (Wikipedia)
             _TestSection(
               number: 2,
+              title: 'Cross-Origin Iframe (Wikipedia)',
+              description:
+                  'Scroll inside the Wikipedia article. '
+                  'When it reaches the bottom, the parent page should '
+                  'take over and keep scrolling.',
+              color: Colors.orange,
+              child: const SizedBox(
+                height: 400,
+                child: HtmlElementView(viewType: 'wikipedia-iframe'),
+              ),
+            ),
+
+            // TEST 3: Wikipedia iframe inside a scrollable div
+            _TestSection(
+              number: 3,
+              title: 'Cross-Origin Iframe in Scrollable Div (Wikipedia)',
+              description:
+                  'The Wikipedia page is loaded inside a <div '
+                  'overflow:auto> which is itself inside an iframe. Scroll '
+                  'inside it to the bottom, then keep scrolling to test '
+                  'chained boundary crossing.',
+              color: Colors.deepOrange,
+              child: const SizedBox(
+                height: 400,
+                child: HtmlElementView(viewType: 'wikipedia-in-div'),
+              ),
+            ),
+
+            // TEST 4: Cross-origin iframe (YouTube)
+            _TestSection(
+              number: 4,
               title: 'Cross-Origin Iframe (YouTube)',
               description: 'Move your cursor over the video and scroll. '
                   'The page should continue scrolling without getting stuck.',
@@ -210,9 +287,9 @@ class _ComprehensiveTestPageState extends State<ComprehensiveTestPage> {
               ),
             ),
 
-            // TEST 3: Same-origin scrollable div
+            // TEST 5: Same-origin scrollable div
             _TestSection(
-              number: 3,
+              number: 5,
               title: 'Same-Origin Scrollable HTML',
               description:
                   'This HTML div has its own scroll. Scroll inside it to '
@@ -225,9 +302,9 @@ class _ComprehensiveTestPageState extends State<ComprehensiveTestPage> {
               ),
             ),
 
-            // TEST 4: Keyboard scroll
+            // TEST 6: Keyboard scroll
             _TestSection(
-              number: 4,
+              number: 6,
               title: 'Keyboard Scroll',
               description: 'Click on the page, then press Page Down, Space, '
                   'or Arrow Down. The browser should handle keyboard scrolling '
@@ -256,9 +333,9 @@ class _ComprehensiveTestPageState extends State<ComprehensiveTestPage> {
               ),
             ),
 
-            // TEST 5: Overlays & Dialogs
+            // TEST 7: Overlays & Dialogs
             _TestSection(
-              number: 5,
+              number: 7,
               title: 'Overlays & Dialogs',
               description: 'Test dialogs, menus, dropdowns, and bottom sheets '
                   'inside BrowserScrollable. They should position correctly '
@@ -268,11 +345,11 @@ class _ComprehensiveTestPageState extends State<ComprehensiveTestPage> {
             ),
 
             // More content for scrolling
-            for (int i = 6; i <= 25; i++) _FlutterCard(index: i),
+            for (int i = 8; i <= 25; i++) _FlutterCard(index: i),
 
-            // TEST 6: Bottom reached
+            // TEST 8: Bottom reached
             _TestSection(
-              number: 6,
+              number: 8,
               title: 'Bottom Reached',
               description: 'You scrolled to the bottom without getting stuck! '
                   'All scroll boundary crossing scenarios are working.',
