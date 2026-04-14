@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'dart:ui_web' as ui_web;
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
+import 'package:web/web.dart' as web;
 
 void main() {
   _registerPlatformViews();
@@ -13,106 +11,111 @@ void _registerPlatformViews() {
   ui_web.platformViewRegistry.registerViewFactory(
     'youtube-iframe',
     (int viewId) {
-      return html.IFrameElement()
-        ..src = 'https://www.youtube.com/embed/dQw4w9WgXcQ'
-        ..style.border = 'none'
-        ..style.width = '100%'
-        ..style.height = '100%'
-        ..allow =
-            'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
-        ..setAttribute('allowfullscreen', 'true');
+      final iframe = web.document.createElement('iframe') as web.HTMLIFrameElement;
+      iframe.src = 'https://www.youtube.com/embed/dQw4w9WgXcQ';
+      iframe.style.border = 'none';
+      iframe.style.width = '100%';
+      iframe.style.height = '100%';
+      iframe.allow =
+          'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      iframe.setAttribute('allowfullscreen', 'true');
+      return iframe;
     },
   );
 
-  ui_web.platformViewRegistry.registerViewFactory('wikipedia-iframe', (
-    int viewId,
-  ) {
-    return html.IFrameElement()
-      ..src = 'https://en.wikipedia.org/wiki/Main_Page'
-      ..style.border = 'none'
-      ..style.width = '100%'
-      ..style.height = '100%';
-  });
+  ui_web.platformViewRegistry.registerViewFactory(
+    'wikipedia-iframe',
+    (int viewId) {
+      final iframe = web.document.createElement('iframe') as web.HTMLIFrameElement;
+      iframe.src = 'https://en.wikipedia.org/wiki/Main_Page';
+      iframe.style.border = 'none';
+      iframe.style.width = '100%';
+      iframe.style.height = '100%';
+      return iframe;
+    },
+  );
 
-  ui_web.platformViewRegistry.registerViewFactory('wikipedia-in-div', (
-    int viewId,
-  ) {
-    // The iframe is taller than the div so the div has real scroll content.
-    // Chain: Wikipedia (cross-origin) → div (overflow:auto) → Flutter page.
-    final label = html.DivElement()
-      ..text =
-          '⬇ overflow:auto div — scroll here first, then the Flutter page takes over'
-      ..style.background = '#e65100'
-      ..style.color = 'white'
-      ..style.padding = '6px 12px'
-      ..style.fontSize = '12px'
-      ..style.fontFamily = 'monospace'
-      ..style.position = 'sticky'
-      ..style.top = '0'
-      ..style.zIndex = '10';
+  ui_web.platformViewRegistry.registerViewFactory(
+    'wikipedia-in-div',
+    (int viewId) {
+      // The iframe is taller than the div so the div has real scroll content.
+      // Chain: Wikipedia (cross-origin) → div (overflow:auto) → Flutter page.
+      final label = web.document.createElement('div') as web.HTMLDivElement;
+      label.textContent =
+          '⬇ overflow:auto div — scroll here first, then the Flutter page takes over';
+      label.style.background = '#e65100';
+      label.style.color = 'white';
+      label.style.padding = '6px 12px';
+      label.style.fontSize = '12px';
+      label.style.fontFamily = 'monospace';
+      label.style.position = 'sticky';
+      label.style.top = '0';
+      label.style.zIndex = '10';
 
-    final iframe = html.IFrameElement()
-      ..src = 'https://en.wikipedia.org/wiki/Main_Page'
-      ..style.border = 'none'
-      ..style.width = '100%'
-      ..style.height = '800px'
-      ..style.display = 'block';
+      final iframe = web.document.createElement('iframe') as web.HTMLIFrameElement;
+      iframe.src = 'https://en.wikipedia.org/wiki/Main_Page';
+      iframe.style.border = 'none';
+      iframe.style.width = '100%';
+      iframe.style.height = '800px';
+      iframe.style.display = 'block';
 
-    final container = html.DivElement()
-      ..style.width = '100%'
-      ..style.height = '100%'
-      ..style.overflow = 'auto'
-      ..style.border = '2px solid #e65100'
-      ..style.boxSizing = 'border-box'
-      ..append(label)
-      ..append(iframe);
+      final container = web.document.createElement('div') as web.HTMLDivElement;
+      container.style.width = '100%';
+      container.style.height = '100%';
+      container.style.overflow = 'auto';
+      container.style.border = '2px solid #e65100';
+      container.style.boxSizing = 'border-box';
+      container.append(label);
+      container.append(iframe);
 
-    return container;
-  });
+      return container;
+    },
+  );
 
   ui_web.platformViewRegistry.registerViewFactory(
     'scrollable-html-div',
     (int viewId) {
-      final container = html.DivElement()
-        ..style.width = '100%'
-        ..style.height = '100%'
-        ..style.overflow = 'auto'
-        ..style.backgroundColor = '#f5f5f5'
-        ..style.fontFamily = 'Arial, sans-serif'
-        ..style.fontSize = '14px'
-        ..style.padding = '16px'
-        ..style.boxSizing = 'border-box';
+      final container = web.document.createElement('div') as web.HTMLDivElement;
+      container.style.width = '100%';
+      container.style.height = '100%';
+      container.style.overflow = 'auto';
+      container.style.backgroundColor = '#f5f5f5';
+      container.style.fontFamily = 'Arial, sans-serif';
+      container.style.fontSize = '14px';
+      container.style.padding = '16px';
+      container.style.boxSizing = 'border-box';
 
-      final title = html.HeadingElement.h3()
-        ..text = 'Same-Origin Scrollable HTML'
-        ..style.color = '#6200ea'
-        ..style.marginTop = '0';
+      final title = web.document.createElement('h3') as web.HTMLHeadingElement;
+      title.textContent = 'Same-Origin Scrollable HTML';
+      title.style.color = '#6200ea';
+      title.style.marginTop = '0';
       container.append(title);
 
-      final desc = html.ParagraphElement()
-        ..text = 'This is a same-origin <div> with overflow:auto. '
-            'It has its own scrollable content. When this div reaches '
-            'its scroll boundary, the parent Flutter page should take over.'
-        ..style.color = '#666';
+      final desc = web.document.createElement('p') as web.HTMLParagraphElement;
+      desc.textContent = 'This is a same-origin <div> with overflow:auto. '
+          'It has its own scrollable content. When this div reaches '
+          'its scroll boundary, the parent Flutter page should take over.';
+      desc.style.color = '#666';
       container.append(desc);
 
       for (int i = 1; i <= 30; i++) {
-        final item = html.DivElement()
-          ..style.padding = '12px'
-          ..style.margin = '4px 0'
-          ..style.backgroundColor = i.isEven ? '#e8eaf6' : '#ffffff'
-          ..style.borderRadius = '4px'
-          ..style.borderLeft = '3px solid #6200ea';
+        final item = web.document.createElement('div') as web.HTMLDivElement;
+        item.style.padding = '12px';
+        item.style.margin = '4px 0';
+        item.style.backgroundColor = i.isEven ? '#e8eaf6' : '#ffffff';
+        item.style.borderRadius = '4px';
+        item.style.borderLeft = '3px solid #6200ea';
 
-        final itemTitle = html.Element.tag('strong')..text = 'HTML Item $i';
+        final itemTitle = web.document.createElement('strong');
+        itemTitle.textContent = 'HTML Item $i';
         item.append(itemTitle);
 
-        final itemText = html.ParagraphElement()
-          ..text = 'This is native HTML content inside a scrollable div. '
-              'Scroll down to reach the boundary.'
-          ..style.margin = '4px 0 0 0'
-          ..style.fontSize = '12px'
-          ..style.color = '#888';
+        final itemText = web.document.createElement('p') as web.HTMLParagraphElement;
+        itemText.textContent = 'This is native HTML content inside a scrollable div. '
+            'Scroll down to reach the boundary.';
+        itemText.style.margin = '4px 0 0 0';
+        itemText.style.fontSize = '12px';
+        itemText.style.color = '#888';
         item.append(itemText);
 
         container.append(item);
@@ -148,31 +151,8 @@ class ComprehensiveTestPage extends StatefulWidget {
 }
 
 class _ComprehensiveTestPageState extends State<ComprehensiveTestPage> {
-  final _scrollController = ScrollController();
-  double _scrollOffset = 0;
   String _dropdownValue = 'Option A';
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(() {
-      setState(() {
-        _scrollOffset = _scrollController.offset;
-      });
-    });
-  }
-
-  static const MethodChannel _browserScrollChannel = MethodChannel(
-    'flutter/browser_scroll',
-    JSONMethodCodec(),
-  );
-
-  Future<void> _browserSmoothScrollTo(double offset) {
-    return _browserScrollChannel.invokeMethod<void>(
-      'smoothScrollTo',
-      <String, Object?>{'offset': offset},
-    );
-  }
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void dispose() {
@@ -186,45 +166,59 @@ class _ComprehensiveTestPageState extends State<ComprehensiveTestPage> {
       appBar: AppBar(
         title: const Text('Comprehensive Scroll Test'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Center(
-              child: Text(
-                '${_scrollOffset.toStringAsFixed(0)}px',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'monospace',
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           FloatingActionButton.extended(
             heroTag: 'top',
-            onPressed: () => _browserSmoothScrollTo(0),
+            onPressed: () => _scrollController.animateTo(
+              0,
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeInOut,
+            ),
             icon: const Icon(Icons.arrow_upward),
             label: const Text('Scroll to Top'),
           ),
           const SizedBox(height: 8),
           FloatingActionButton.extended(
             heroTag: 'bottom',
-            onPressed: () => _browserSmoothScrollTo(999999),
+            onPressed: () => _scrollController.animateTo(
+              _scrollController.position.maxScrollExtent,
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeInOut,
+            ),
             icon: const Icon(Icons.arrow_downward),
             label: const Text('Scroll to Bottom'),
           ),
         ],
       ),
       body: BrowserScrollable(
-        controller: _scrollController,
         child: ListView(
           controller: _scrollController,
-          physics: const BrowserScrollPhysics(),
           children: [
+            const SizedBox(height: 48),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24),
+              child: Text(
+                'This demo explores browser-driven scrolling in Flutter Web. '
+                'Normally, Flutter intercepts all scroll events and handles '
+                'them in Dart. The BrowserScrollable widget solves this by letting '
+                'the browser own the scroll position. When the user scrolls, '
+                'the browser moves the page natively, and the engine reports '
+                'the new offset back to Flutter via a dart:ui callback. '
+                'Flutter then syncs its internal pixel position to match. '
+                'This approach restores native browser behaviors while keeping '
+                'the Flutter widget tree fully in control of layout and '
+                'painting. Nested scrollables, pull-to-refresh, platform views, '
+                'cross-origin iframes, and programmatic scrolling via '
+                'ScrollController all continue to work correctly. Scroll down '
+                'to explore each test case and observe how the framework '
+                'handles each scenario.',
+                style: TextStyle(fontSize: 15, height: 1.6, color: Colors.black87),
+              ),
+            ),
+            const SizedBox(height: 24),
             // TEST 1: Basic scroll
             _TestSection(
               number: 1,
@@ -232,7 +226,7 @@ class _ComprehensiveTestPageState extends State<ComprehensiveTestPage> {
               description: 'Scroll this page with mouse wheel or trackpad. '
                   'The browser drives scrolling natively.',
               color: Colors.blue,
-              status: _scrollOffset > 50 ? TestStatus.pass : TestStatus.pending,
+              status: TestStatus.pending,
               child: SizedBox(
                 height: 400,
                 child: ListView(
@@ -243,12 +237,24 @@ class _ComprehensiveTestPageState extends State<ComprehensiveTestPage> {
               ),
             ),
 
-            // TEST 2: Cross-origin iframe (Wikipedia)
+            // TEST 2: Pull-to-refresh at top edge
             _TestSection(
               number: 2,
+              title: 'Pull-to-Refresh (RefreshIndicator)',
+              description: 'Pull down on this inner list when it is at its top. '
+                  'A refresh indicator should appear. Overscroll at the top '
+                  'edge is preserved so that RefreshIndicator works. '
+                  'At the bottom edge, the inner list clamps and the '
+                  'parent page takes over.',
+              color: Colors.cyan,
+              child: const _PullToRefreshTest(),
+            ),
+
+            // TEST 3: Cross-origin iframe (Wikipedia)
+            _TestSection(
+              number: 3,
               title: 'Cross-Origin Iframe (Wikipedia)',
-              description:
-                  'Scroll inside the Wikipedia article. '
+              description: 'Scroll inside the Wikipedia article. '
                   'When it reaches the bottom, the parent page should '
                   'take over and keep scrolling.',
               color: Colors.orange,
@@ -258,12 +264,11 @@ class _ComprehensiveTestPageState extends State<ComprehensiveTestPage> {
               ),
             ),
 
-            // TEST 3: Wikipedia iframe inside a scrollable div
+            // TEST 4: Wikipedia iframe inside a scrollable div
             _TestSection(
-              number: 3,
+              number: 4,
               title: 'Cross-Origin Iframe in Scrollable Div (Wikipedia)',
-              description:
-                  'The Wikipedia page is loaded inside a <div '
+              description: 'The Wikipedia page is loaded inside a <div '
                   'overflow:auto> which is itself inside an iframe. Scroll '
                   'inside it to the bottom, then keep scrolling to test '
                   'chained boundary crossing.',
@@ -274,9 +279,9 @@ class _ComprehensiveTestPageState extends State<ComprehensiveTestPage> {
               ),
             ),
 
-            // TEST 4: Cross-origin iframe (YouTube)
+            // TEST 5: Cross-origin iframe (YouTube)
             _TestSection(
-              number: 4,
+              number: 5,
               title: 'Cross-Origin Iframe (YouTube)',
               description: 'Move your cursor over the video and scroll. '
                   'The page should continue scrolling without getting stuck.',
@@ -287,9 +292,9 @@ class _ComprehensiveTestPageState extends State<ComprehensiveTestPage> {
               ),
             ),
 
-            // TEST 5: Same-origin scrollable div
+            // TEST 6: Same-origin scrollable div
             _TestSection(
-              number: 5,
+              number: 6,
               title: 'Same-Origin Scrollable HTML',
               description:
                   'This HTML div has its own scroll. Scroll inside it to '
@@ -302,9 +307,9 @@ class _ComprehensiveTestPageState extends State<ComprehensiveTestPage> {
               ),
             ),
 
-            // TEST 6: Keyboard scroll
+            // TEST 7: Keyboard scroll
             _TestSection(
-              number: 6,
+              number: 7,
               title: 'Keyboard Scroll',
               description: 'Click on the page, then press Page Down, Space, '
                   'or Arrow Down. The browser should handle keyboard scrolling '
@@ -333,9 +338,9 @@ class _ComprehensiveTestPageState extends State<ComprehensiveTestPage> {
               ),
             ),
 
-            // TEST 7: Overlays & Dialogs
+            // TEST 8: Overlays & Dialogs
             _TestSection(
-              number: 7,
+              number: 8,
               title: 'Overlays & Dialogs',
               description: 'Test dialogs, menus, dropdowns, and bottom sheets '
                   'inside BrowserScrollable. They should position correctly '
@@ -345,11 +350,11 @@ class _ComprehensiveTestPageState extends State<ComprehensiveTestPage> {
             ),
 
             // More content for scrolling
-            for (int i = 8; i <= 25; i++) _FlutterCard(index: i),
+            for (int i = 9; i <= 25; i++) _FlutterCard(index: i),
 
-            // TEST 8: Bottom reached
+            // TEST 9: Bottom reached
             _TestSection(
-              number: 8,
+              number: 9,
               title: 'Bottom Reached',
               description: 'You scrolled to the bottom without getting stuck! '
                   'All scroll boundary crossing scenarios are working.',
@@ -692,6 +697,54 @@ class _TestSection extends StatelessWidget {
             child: child,
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _PullToRefreshTest extends StatefulWidget {
+  const _PullToRefreshTest();
+
+  @override
+  State<_PullToRefreshTest> createState() => _PullToRefreshTestState();
+}
+
+class _PullToRefreshTestState extends State<_PullToRefreshTest> {
+  final _items = List.generate(10, (i) => 'Refresh Item ${i + 1}');
+  int _refreshCount = 0;
+
+  Future<void> _onRefresh() async {
+    await Future<void>.delayed(const Duration(seconds: 1));
+    setState(() {
+      _refreshCount++;
+      _items.insert(0, 'New item from refresh #$_refreshCount');
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 300,
+      child: RefreshIndicator(
+        onRefresh: _onRefresh,
+        child: ListView.builder(
+          itemCount: _items.length,
+          itemBuilder: (context, index) {
+            return ListTile(
+              dense: true,
+              leading: Icon(
+                index == 0 && _refreshCount > 0
+                    ? Icons.fiber_new
+                    : Icons.circle,
+                size: 16,
+                color: index == 0 && _refreshCount > 0
+                    ? Colors.cyan
+                    : Colors.grey,
+              ),
+              title: Text(_items[index]),
+            );
+          },
+        ),
       ),
     );
   }
